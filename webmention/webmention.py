@@ -10,6 +10,7 @@ from flask import request, Response, Blueprint
 from flask import current_app as app
 from ronkyuu import findMentions, discoverEndpoint
 from redis import Redis
+from fakeredis import FakeStrictRedis
 from rq import Queue
 
 webmention_bp = Blueprint('webmention_bp', __name__)
@@ -32,9 +33,16 @@ def handle_root():
         return Response(response='target URL does not support webmentions',
                         status=400)
 
-    q = Queue(connection=Redis())
+    q = queue()
     q.enqueue(process_webmention, commit_url(source, target), source, target)
     return Response(status=202)
+
+
+def queue():
+    if app.config['TESTING']:
+        return Queue(is_async=False, connection=FakeStrictRedis())
+    else:
+        return Queue(connection=Redis())
 
 
 def commit_url(source, target):
@@ -72,15 +80,19 @@ def process_webmention(commit_url, source, target):
     if not result['refs']:
         raise Exception('target not found in source')
 
-    parsed = mf2py.Parser(url=source).to_dict()
+    parsed = mf2parse(source)
     webmention = {
         'sourceUrl': source,
         'targetUrl': target,
         'parsedSource': parsed
     }
-    r = commit_file(commit_url, json.dump(webmention))
+    r = commit_file(commit_url, json.dumps(webmention))
     if r.status_code != 201:
         raise Exception(f'failed to post to github: {r.status_code}, {r.text}')
+
+
+def mf2parse(source):
+    return mf2py.Parser(url=source).to_dict()
 
 
 def commit_file(url, content):
