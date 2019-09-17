@@ -25,7 +25,7 @@ def handle_root():
         return Response(response='source URL is the same as target URL',
                         status=400)
 
-    if not target.startswith(app.config['WEBSITE_URL']):
+    if not target.startswith(os.environ['ME']):
         return Response(response='webmentions not supported on target domain',
                         status=400)
 
@@ -39,7 +39,7 @@ def handle_root():
 
 
 def queue():
-    if app.config['TESTING']:
+    if app.config.get('TESTING', True):
         return Queue(is_async=False, connection=FakeStrictRedis())
     else:
         return Queue(connection=Redis())
@@ -49,7 +49,12 @@ def commit_url(source, target):
     wmpath = webmention_path(source, target)
     if not wmpath.startswith('/'):
         wmpath = '/' + wmpath
-    return app.config['REPO_URL_ROOT'] + wmpath
+    return repo_url_root() + wmpath
+
+
+def repo_url_root():
+    repo = os.environ['GITHUB_REPO']
+    return f'https://api.github.com/repos/{repo}/contents'
 
 
 def webmention_path(source, target):
@@ -62,7 +67,7 @@ def webmention_folder(target):
     path = extract_path(target)
     if path.startswith('/'):
         path = path[1:]
-    return os.path.join(app.config['WEBMENTION_FOLDER'], path)
+    return os.path.join(os.environ['WEBMENTION_FOLDER'], path)
 
 
 def extract_path(target):
@@ -97,7 +102,7 @@ def mf2parse(source):
 
 def commit_file(url, content):
     c = base64.b64encode(content.encode()).decode()
-    return requests.put(url, auth=(app.config['GITHUB_USERNAME'],
-                                   app.config['GITHUB_PASSWORD']),
+    return requests.put(url, auth=(os.environ['GITHUB_USERNAME'],
+                                   os.environ['GITHUB_PASSWORD']),
                         data=json.dumps({'message': 'post to ' + url,
                                          'content': c}))
