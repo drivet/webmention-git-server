@@ -1,3 +1,4 @@
+import os
 import hashlib
 from webmention import app
 from webmention.webmention import commit_url, process_webmention
@@ -5,9 +6,9 @@ from unittest.mock import patch, MagicMock
 
 
 app.config['TESTING'] = True
-app.config['REPO_URL_ROOT'] = 'https://api.github.com/test'
-app.config['WEBMENTION_FOLDER'] = 'webmentions_go_here'
-app.config['WEBSITE_URL'] = 'http://thisisme.com'
+os.environ['GITHUB_REPO'] = 'drivet/a_github_repo'
+os.environ['WEBMENTION_FOLDER'] = 'webmentions_go_here'
+os.environ['ME'] = 'http://thisisme.com'
 
 
 def test_commit_url():
@@ -18,8 +19,8 @@ def test_commit_url():
         url = commit_url(sourceUrl, targetUrl)
 
         sourceHash = hashlib.md5(sourceUrl.encode()).hexdigest()
-        assert url == f'https://api.github.com/test/' + \
-            f'webmentions_go_here/stuff/{sourceHash}.wm'
+        assert url == f'https://api.github.com/repos/drivet/a_github_repo/' + \
+            f'contents/webmentions_go_here/stuff/{sourceHash}.wm'
 
 
 def test_source_must_be_different_from_target():
