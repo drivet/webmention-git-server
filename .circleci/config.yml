@@ -50,5 +50,5 @@ jobs:
           name: deploy docker image to test server
           command: |
             . venv/bin/activate
-            fab -H dcr@desmondrivet.com deploytest
+            fab deploytest
             
