@@ -42,7 +42,11 @@ def queue():
     if app.config.get('TESTING', True):
         return Queue(is_async=False, connection=FakeStrictRedis())
     else:
-        return Queue(connection=Redis())
+        return Queue(connection=Redis.from_url(redis_url()))
+
+
+def redis_url():
+    return os.environ.get('REDIS_URL') or 'redis://'
 
 
 def commit_url(source, target):

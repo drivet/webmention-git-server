@@ -1,0 +1,30 @@
+version: '3'
+services:
+  webmention-git-server:
+    image: "desmondrivet/webmention-git-server:master"
+    container_name: webmention-git-server
+    ports:
+      - "3131:3031"
+    environment:
+      - ME
+      - GITHUB_REPO
+      - WEBMENTION_FOLDER
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+  rq-worker:
+    image: "desmondrivet/webmention-git-server:master"
+    container_name: rq-worker
+    environment:
+      - GITHUB_USERNAME
+      - GITHUB_PASSWORD
+    depends_on:
+      - redis
+    entrypoint:
+      - rq
+      - worker
+      - --url
+      - redis://redis:6379
+  redis:
+    container_name: redis
+    image: "redis:alpine"

@@ -10,8 +10,6 @@ WORKDIR /app
 
 ADD . /app
 
-ENV WEBMENTION_ROOT /var/local/webmention
-
 RUN pip install -r requirements-prod.txt
 
 CMD ["uwsgi", "app.ini"]
