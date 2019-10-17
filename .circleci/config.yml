@@ -15,13 +15,23 @@ jobs:
 
       - setup_remote_docker
       
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
+            
       - run:
           name: install dependencies
           command: |
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-
+            
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          
       - run:
           name: run tests
           command: |
@@ -47,8 +57,7 @@ jobs:
             invoke dpush
 
       - run:
-          name: deploy docker image to test server
+          name: deploy docker image to server
           command: |
             . venv/bin/activate
-            fab deploytest
-            
+            fab deploy
