@@ -97,7 +97,8 @@ def process_webmention(commit_url, source, target):
     }
     r = commit_file(commit_url, json.dumps(webmention))
     if r.status_code != 201:
-        raise Exception(f'failed to post to github: {r.status_code}, {r.text}')
+        raise Exception(f'failed to post {commit_url} to github: ' +
+                        f'{r.status_code}, {r.text}')
 
 
 def mf2parse(source):
