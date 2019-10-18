@@ -28,7 +28,7 @@ def env_cmd(e):
     return 'export ' + e + '="' + os.environ[e] + '"'
 
 
-@task(hosts=["dcr@desmondrivet.com"])
+@task(hosts=["dcr@webmention.desmondrivet.com"])
 @task
 def deploy(c):
     Transfer(c).put('docker-compose.yml', '/tmp')
