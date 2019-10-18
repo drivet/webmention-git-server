@@ -9,7 +9,7 @@ if branch == 'master':
 else:
     port = 3131
 
-os.environ['PORT'] = port
+os.environ['PORT'] = f'{port}'
 
 image = f'desmondrivet/webmention-git-server:{branch}'
 name = 'webmention-git-server'
