@@ -22,13 +22,13 @@ VERSION = '0.1.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'Flask', 'requests', 'mf2py', 'ronkyuu', 'rq'
+    'Flask', 'PyGithub', 'mf2py', 'ronkyuu', 'rq'
 ]
 
 # What packages are optional?
 EXTRAS = {
-    'dev': ['invoke', 'fabric', 'nose',
-            'jedi', 'rope', 'flake8', 'autopep8', 'yapf', 'black']
+    'dev': ['invoke', 'fabric', 'nose', 'jedi', 'rope', 'flake8',
+            'autopep8', 'yapf', 'black', 'twine']
 }
 
 # The rest you shouldn't have to touch too much :)
